@@ -19,6 +19,17 @@ const pool = new Pool({
     password: '2772',
     port: 5432,
 })
+
+app.get('/rick/list', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT nome, idade, altura, peso FROM suneca')
+        res.json(result.rows)
+    } catch (error) {
+        console.error('Erro ao listar registros:', error)
+        res.status(500).json({ message: 'Erro ao listar registros.' })
+    }
+})
+
 app.post('/rick/add', async (req, res) => {
     console.log('Dados recebidos:', req.body)
     const { nomeInput, idadeInput, alturaInput, pesoInput } = req.body
@@ -32,7 +43,7 @@ app.post('/rick/add', async (req, res) => {
         console.error('Erro ao adicionar mocorongo:', error)
         res.status(500).json({ message: 'Erro ao adicionar mocorongo.' })
     }
-});
+})
 
 const PORT = 3000
 app.listen(PORT, () => {
