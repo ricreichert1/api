@@ -4,7 +4,7 @@ const { Pool } = require('pg')
 
 const app = express()
 app.use(cors({
-    origin: '*', 
+    origin: '*',
     methods: ['GET', 'POST'],
     allowedHeaders: ['Content-Type'],
 }))
@@ -28,7 +28,24 @@ app.get('/rick/list', async (req, res) => {
         console.error('Erro ao listar registros:', error)
         res.status(500).json({ message: 'Erro ao listar registros.' })
     }
+})
+
+app.get('/rick/check-cpf/:cpf', async (req, res) => {
+    var { cpf } = req.params;
+    try {
+        var resultado = await pool.query('SELECT cpf FROM suneca WHERE cpf = $1', [cpf]);
+        
+        if (resultado.rows.length > 0) {
+            res.status(200).json({ exists: true });
+        } else {
+            res.status(200).json({ exists: false });
+        }
+    } catch (error) {
+        console.error('Erro ao verificar CPF:', error);
+        res.status(500).json({ message: 'Erro ao verificar CPF.' });
+    }
 });
+
 
 
 app.post('/rick/add', async (req, res) => {
