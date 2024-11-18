@@ -20,6 +20,23 @@ const pool = new Pool({
     port: 5432,
 })
 
+app.get('/rick/search/:query', async (req, res) => {
+    const { query } = req.params;
+
+    try {
+        const result = await pool.query(
+            `SELECT nome, idade, altura, peso, cpf, dataregistro 
+             FROM suneca 
+             WHERE nome ILIKE $1`,
+            [`${query}%`]
+        );
+        res.json(result.rows)
+    } catch (error) {
+        console.error('Erro ao buscar registros:', error)
+        res.status(500).json({ message: 'Erro ao buscar registros.' })
+    }
+});
+
 app.get('/rick/list', async (req, res) => {
     try {
         const result = await pool.query('SELECT nome, idade, altura, peso, cpf, dataregistro FROM suneca')
@@ -31,20 +48,20 @@ app.get('/rick/list', async (req, res) => {
 })
 
 app.get('/rick/check-cpf/:cpf', async (req, res) => {
-    var { cpf } = req.params;
+    var { cpf } = req.params
     try {
-        var resultado = await pool.query('SELECT cpf FROM suneca WHERE cpf = $1', [cpf]);
+        var resultado = await pool.query('SELECT cpf FROM suneca WHERE cpf = $1', [cpf])
         
         if (resultado.rows.length > 0) {
-            res.status(200).json({ exists: true });
+            res.status(200).json({ exists: true })
         } else {
-            res.status(200).json({ exists: false });
+            res.status(200).json({ exists: false })
         }
     } catch (error) {
-        console.error('Erro ao verificar CPF:', error);
-        res.status(500).json({ message: 'Erro ao verificar CPF.' });
+        console.error('Erro ao verificar CPF:', error)
+        res.status(500).json({ message: 'Erro ao verificar CPF.' })
     }
-});
+})
 
 
 
