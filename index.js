@@ -20,6 +20,33 @@ const pool = new Pool({
     port: 5432,
 })
 
+app.get('/rick/list', async (req, res) => {
+    const page = parseInt(req.query.page) || 1
+    const pageSize = 3
+    const offset = (page - 1) * pageSize
+
+    try {
+        const result = await pool.query(
+            'SELECT nome, idade, altura, peso, cpf, dataregistro FROM suneca LIMIT $1 OFFSET $2',
+            [pageSize, offset]
+        )
+        const total = await pool.query('SELECT COUNT(*) FROM suneca') 
+        const totalPages = Math.ceil(total.rows[0].count / pageSize)
+
+        res.json({
+            registros: result.rows,
+            total: total.rows[0].count,
+            totalPages: totalPages
+        })
+    } catch (error) {
+        console.error('Erro ao listar registros:', error)
+        res.status(500).json({ message: 'Erro ao listar registros.' })
+    }
+})
+
+
+
+
 app.get('/rick/search/:query', async (req, res) => {
     const { query } = req.params
 
